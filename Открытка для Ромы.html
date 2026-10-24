@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Рома, выздоравливай</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Layout: a pitch background, a striped No.10 jersey up top, a mini goal you score into for each wish */
+:root {
+  --grass-a: #2f8f4e;
+  --grass-b: #2a8247;
+  --line: rgba(255,255,255,.55);
+  --sky: #74b9e8;
+  --sky-deep: #3d8fcc;
+  --paper: #fbfdff;
+  --ink: #1d2b3a;
+  --ink-soft: #566778;
+  --gold: #f2b632;
+  --font-display: "Russo One", "Arial Black", sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+html, body { min-height: 100%; }
+body {
+  background:
+    radial-gradient(circle at 50% 120px, transparent 70px, var(--line) 71px, var(--line) 73px, transparent 74px),
+    repeating-linear-gradient(180deg, var(--grass-a) 0 64px, var(--grass-b) 64px 128px);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+  overflow-x: hidden;
+}
+.scene { max-width: 520px; margin: 0 auto; display: grid; justify-items: center; }
+.jersey { width: 190px; max-width: 60%; margin-bottom: -40px; position: relative; z-index: 2; filter: drop-shadow(0 10px 16px rgba(0,0,0,.25)); animation: drop .9s cubic-bezier(.2,.9,.3,1.2) both; }
+.card {
+  position: relative; z-index: 1; width: 100%;
+  background: var(--paper); border-radius: 20px;
+  box-shadow: 0 18px 40px rgba(0, 40, 20, .3);
+  padding: 56px 24px 26px; text-align: center;
+  display: grid; gap: 16px;
+}
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 7.5vw, 40px); line-height: 1.1; margin: 0; color: var(--sky-deep); text-wrap: balance; }
+.poem { font-size: 18px; line-height: 1.55; margin: 0; font-weight: 600; }
+.pitch-box { background: linear-gradient(180deg, #e9f6ee, #d7efe0); border-radius: 14px; padding: 16px 14px 18px; display: grid; gap: 12px; justify-items: center; }
+.goal-area { position: relative; width: 100%; max-width: 320px; height: 150px; }
+.goal { position: absolute; left: 50%; top: 4px; width: 200px; height: 74px; transform: translateX(-50%); border: 5px solid #fff; border-bottom: 0; border-radius: 4px 4px 0 0;
+  background: repeating-linear-gradient(45deg, rgba(29,43,58,.12) 0 2px, transparent 2px 10px), repeating-linear-gradient(-45deg, rgba(29,43,58,.12) 0 2px, transparent 2px 10px);
+  box-shadow: 0 2px 0 rgba(0,0,0,.15); }
+.goal.shake { animation: shake .45s; }
+.ball { position: absolute; left: 50%; bottom: 0; width: 46px; height: 46px; margin-left: -23px; border: 0; padding: 0; background: none; cursor: pointer; border-radius: 50%; }
+.ball svg { width: 100%; height: 100%; display: block; }
+.ball.kick { animation: kick .6s cubic-bezier(.3,.6,.4,1) forwards; }
+.ball:focus-visible { outline: 3px solid var(--sky-deep); outline-offset: 3px; }
+.score { font-family: var(--font-display); font-size: 20px; font-variant-numeric: tabular-nums; color: var(--ink); }
+.score b { color: var(--sky-deep); font-weight: 400; }
+.wish { min-height: 3em; font-size: 17px; line-height: 1.45; max-width: 32ch; margin: 0; transition: opacity .25s; }
+.wish.fade { opacity: 0; }
+.hint { font-size: 13px; color: var(--ink-soft); margin: 0; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.btn { font: 800 15px var(--font-body); color: #fff; background: var(--sky-deep); border: 0; border-radius: 999px; padding: 11px 20px; cursor: pointer; box-shadow: 0 6px 14px rgba(61,143,204,.35); }
+.btn.ghost { background: transparent; color: var(--ink-soft); box-shadow: none; border: 2px solid #c9d6e2; }
+.btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.sign { font-family: var(--font-display); font-size: 17px; color: var(--ink-soft); margin: 0; }
+canvas#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+@keyframes drop { from { transform: translateY(-40px) rotate(-8deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes kick { 0% { transform: none; } 60% { transform: translate(var(--dx, 0px), -92px) scale(.62) rotate(540deg); } 100% { transform: translate(var(--dx, 0px), -84px) scale(.6) rotate(600deg); } }
+@keyframes shake { 0%,100% { transform: translateX(-50%); } 25% { transform: translateX(calc(-50% - 4px)) scaleY(1.04); } 60% { transform: translateX(calc(-50% + 3px)); } }
+@media (prefers-reduced-motion: reduce) { .jersey, .ball.kick, .goal.shake { animation: none; } .wish { transition: none; } }
+</style>
+</head><body>
+
+<main class="scene">
+  <svg class="jersey" viewBox="0 0 200 190" aria-hidden="true">
+    <defs>
+      <clipPath id="shirt"><path d="M60 8 L82 4 Q100 22 118 4 L140 8 L196 40 L176 82 L152 70 L152 186 L48 186 L48 70 L24 82 L4 40 Z"/></clipPath>
+    </defs>
+    <g clip-path="url(#shirt)">
+      <rect width="200" height="190" fill="#ffffff"/>
+      <rect x="20" width="24" height="190" fill="#74b9e8"/>
+      <rect x="68" width="24" height="190" fill="#74b9e8"/>
+      <rect x="116" width="24" height="190" fill="#74b9e8"/>
+      <rect x="164" width="24" height="190" fill="#74b9e8"/>
+    </g>
+    <path d="M60 8 L82 4 Q100 22 118 4 L140 8 L196 40 L176 82 L152 70 L152 186 L48 186 L48 70 L24 82 L4 40 Z" fill="none" stroke="#1d2b3a" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M82 4 Q100 22 118 4" fill="none" stroke="#1d2b3a" stroke-width="5"/>
+    <text x="100" y="70" text-anchor="middle" font-family="Russo One, Arial Black, sans-serif" font-size="20" fill="#1d2b3a" stroke="#fff" stroke-width="4" paint-order="stroke">РОМА</text>
+    <text x="100" y="146" text-anchor="middle" font-family="Russo One, Arial Black, sans-serif" font-size="74" fill="#1d2b3a" stroke="#fff" stroke-width="6" paint-order="stroke">10</text>
+  </svg>
+
+  <article class="card">
+    <h1>Рома, выздоравливай скорее!</h1>
+    <p class="poem">
+      Болезнь — соперник не из сильных,<br>
+      Ты обыграешь без усилий.<br>
+      Чай, плед и сон — твой лучший состав,<br>
+      И скоро снова в строй — на старт!
+    </p>
+
+    <section class="pitch-box" aria-label="Мини-игра: забей гол болезни">
+      <div class="score" id="score">Рома <b>0</b> : 0 Болезнь</div>
+      <div class="goal-area">
+        <div class="goal" id="goal"></div>
+        <button class="ball" id="ball" type="button" aria-label="Пнуть мяч и забить гол">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="47" fill="#fff" stroke="#1d2b3a" stroke-width="4"/>
+            <polygon points="50,30 67,42 61,62 39,62 33,42" fill="#1d2b3a"/>
+            <path d="M50 30 L50 5 M67 42 L91 34 M61 62 L76 84 M39 62 L24 84 M33 42 L9 34" stroke="#1d2b3a" stroke-width="4"/>
+            <path d="M28 12 L50 5 L72 12 M91 34 L94 58 L76 84 M24 84 L6 58 L9 34" fill="none" stroke="#1d2b3a" stroke-width="4"/>
+          </svg>
+        </button>
+      </div>
+      <p class="wish" id="wish" aria-live="polite">Пни мяч — забей гол болезни!</p>
+      <div class="row">
+        <button class="btn" id="kickBtn" type="button">Бить по воротам</button>
+        <button class="btn ghost" id="soundBtn" type="button" aria-pressed="true">Звук: вкл</button>
+      </div>
+    </section>
+
+    <p class="sign">Обнимаем и ждём на поле! ❤</p>
+  </article>
+</main>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+const wishes = [
+  'ГОЛ! Температура выбита из игры.',
+  'ГОЛ! Насморк получил красную карточку.',
+  'ГОЛ! Кашель отправлен на скамейку запасных.',
+  'ГОЛ! Силы возвращаются в основной состав.',
+  'ГОЛ! Судья назначил тебе бонусный отдых и чай с мёдом.',
+  'ГОЛ! Это был хет-трик бодрости.',
+  'ГОЛ! Болельщики скандируют: «Ро-ма, вы-здо-рав-ли-вай!»'
+];
+let goals = 0, busy = false, soundOn = true, ctx = null;
+const ball = document.getElementById('ball'), goal = document.getElementById('goal');
+const wish = document.getElementById('wish'), score = document.getElementById('score');
+const soundBtn = document.getElementById('soundBtn');
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function whistle() {
+  if (!soundOn) return;
+  try {
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = ctx.currentTime;
+    [0, 0.32].forEach((start, k) => {
+      const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = 2650;
+      lfo.frequency.value = 38; lg.gain.value = 120; lfo.connect(lg); lg.connect(o.frequency);
+      const dur = k ? 0.55 : 0.2;
+      g.gain.setValueAtTime(0, t + start);
+      g.gain.linearRampToValueAtTime(0.12, t + start + 0.02);
+      g.gain.setValueAtTime(0.12, t + start + dur - 0.05);
+      g.gain.linearRampToValueAtTime(0, t + start + dur);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t + start); lfo.start(t + start); o.stop(t + start + dur); lfo.stop(t + start + dur);
+    });
+  } catch (e) {}
+}
+
+const cv = document.getElementById('fx'), c2 = cv.getContext('2d');
+let parts = [];
+function confetti() {
+  if (reduce) return;
+  cv.width = innerWidth; cv.height = innerHeight;
+  const r = goal.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const cols = ['#74b9e8', '#ffffff', '#f2b632', '#3d8fcc'];
+  for (let i = 0; i < 90; i++) parts.push({ x: cx, y: cy, vx: (Math.random() - .5) * 9, vy: -Math.random() * 9 - 2, s: 4 + Math.random() * 5, c: cols[i % 4], a: Math.random() * 6, life: 90 });
+  if (parts.length === 90) requestAnimationFrame(tick);
+}
+function tick() {
+  c2.clearRect(0, 0, cv.width, cv.height);
+  parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .25; p.a += .2; p.life--; c2.save(); c2.translate(p.x, p.y); c2.rotate(p.a); c2.fillStyle = p.c; c2.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); c2.restore(); });
+  parts = parts.filter(p => p.life > 0 && p.y < cv.height + 20);
+  if (parts.length) requestAnimationFrame(tick); else c2.clearRect(0, 0, cv.width, cv.height);
+}
+
+function kick() {
+  if (busy) return; busy = true;
+  ball.style.setProperty('--dx', ((Math.random() - .5) * 90).toFixed(0) + 'px');
+  ball.classList.remove('kick'); void ball.offsetWidth; ball.classList.add('kick');
+  setTimeout(() => {
+    goal.classList.remove('shake'); void goal.offsetWidth; goal.classList.add('shake');
+    whistle(); confetti();
+    wish.classList.add('fade');
+    setTimeout(() => {
+      wish.textContent = wishes[goals % wishes.length];
+      goals++;
+      score.innerHTML = `Рома <b>${goals}</b> : 0 Болезнь`;
+      wish.classList.remove('fade');
+    }, 200);
+  }, reduce ? 0 : 420);
+  setTimeout(() => { ball.classList.remove('kick'); busy = false; }, reduce ? 300 : 1500);
+}
+ball.addEventListener('click', kick);
+document.getElementById('kickBtn').addEventListener('click', kick);
+soundBtn.addEventListener('click', () => {
+  soundOn = !soundOn;
+  soundBtn.textContent = soundOn ? 'Звук: вкл' : 'Звук: выкл';
+  soundBtn.setAttribute('aria-pressed', soundOn);
+});
+</script>
+</body></html>
