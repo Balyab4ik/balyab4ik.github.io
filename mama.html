@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Мамин сад гортензий</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Layout: one postcard; a garden of six hydrangea bushes that bloom on tap, each hiding a wish; the full garden reveals the finale */
+:root {
+  --sky: #eef2fb;
+  --sky-2: #f6eef6;
+  --paper: #ffffff;
+  --ink: #3a3550;
+  --ink-soft: #6f6a85;
+  --leaf: #6f9a63;
+  --leaf-2: #86b078;
+  --bud: #d4e6c2;
+  --accent: #8a6fc9;
+  --rose: #e48aae;
+  --font-hand: "Marck Script", "Segoe Script", cursive;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  background: radial-gradient(circle at 15% 10%, #f9e7f1 0, transparent 40%), radial-gradient(circle at 90% 30%, #e3ebfb 0, transparent 45%), linear-gradient(180deg, var(--sky), var(--sky-2));
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 56px;
+  overflow-x: hidden;
+}
+.card {
+  max-width: 560px; margin: 0 auto; background: var(--paper); border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(90, 70, 140, .16);
+  padding: 34px 22px 28px; text-align: center; display: grid; gap: 18px;
+}
+.to { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+h1 { font-family: var(--font-hand); font-weight: 400; font-size: clamp(40px, 11vw, 58px); line-height: 1.05; margin: 0; color: var(--accent); text-wrap: balance; }
+.lead { margin: 0; font-size: 17px; line-height: 1.5; color: var(--ink-soft); }
+.poem { font-family: var(--font-hand); font-size: 24px; line-height: 1.45; margin: 0; color: var(--ink); }
+.garden-box { background: linear-gradient(180deg, #f4f8ef, #e9f2e1); border-radius: 18px; padding: 16px 10px 18px; display: grid; gap: 12px; }
+.hint { margin: 0; font-weight: 700; font-size: 15px; color: var(--leaf); }
+.garden { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.bush { border: 0; background: none; padding: 0; cursor: pointer; border-radius: 16px; transition: transform .2s; }
+.bush:hover { transform: translateY(-3px); }
+.bush:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.bush svg { width: 100%; height: auto; display: block; }
+.bush .fl { transform-box: fill-box; transform-origin: center; transform: scale(.3); fill: var(--bud); transition: transform .6s cubic-bezier(.2,.9,.3,1.4), fill .6s; }
+.bush.open .fl { transform: scale(1); fill: var(--c); }
+.bush.open { cursor: default; }
+.bush .dot { fill: #fff; opacity: 0; transition: opacity .6s; }
+.bush.open .dot { opacity: .85; }
+.wish { margin: 0; min-height: 3em; font-size: 18px; line-height: 1.45; padding-inline: 8px; transition: opacity .25s; }
+.wish.fade { opacity: 0; }
+.meta { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.count { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.btn { font: 800 14px var(--font-body); border-radius: 999px; padding: 9px 16px; cursor: pointer; border: 2px solid #d9d2ea; background: transparent; color: var(--ink-soft); }
+.btn.solid { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 6px 14px rgba(138,111,201,.3); }
+.btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.finale { display: grid; gap: 10px; justify-items: center; animation: pop .8s cubic-bezier(.2,.9,.3,1.3) both; }
+.finale h2 { font-family: var(--font-hand); font-weight: 400; font-size: clamp(36px, 10vw, 50px); margin: 0; color: var(--rose); line-height: 1.1; text-wrap: balance; }
+.finale p { margin: 0; font-size: 17px; line-height: 1.5; max-width: 34ch; }
+.sign { font-family: var(--font-hand); font-size: 28px; color: var(--accent); margin: 0; }
+canvas#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bush .fl, .bush .dot, .wish { transition: none; } .finale { animation: none; } }
+</style>
+</head><body>
+
+<article class="card">
+  <div class="to">Светлане Геннадьевне — нашей маме</div>
+  <h1>Мамочка, с днём рождения!</h1>
+  <p class="poem">
+    Ты из ваты лепишь чудо,<br>
+    Из ростка растишь цветы,<br>
+    И теплее нет уюта,<br>
+    Чем в объятьях доброты.<br>
+    Пусть гортензии пышнее<br>
+    Каждый год в саду цветут,<br>
+    А года, тебя жалея,<br>
+    Только радость принесут!
+  </p>
+
+  <section class="garden-box" aria-label="Сад гортензий с пожеланиями">
+    <p class="hint" id="hint">Нажимай на кусты — в каждом спрятано пожелание</p>
+    <div class="garden" id="garden"></div>
+    <p class="wish" id="wish" aria-live="polite">Твой сад ждёт, когда ты его разбудишь 🌿</p>
+    <div class="meta">
+      <span class="count" id="count">Распустилось 0 из 6</span>
+      <button class="btn" id="soundBtn" type="button" aria-pressed="true">Звук: вкл</button>
+    </div>
+    <div class="finale" id="finale" hidden>
+      <h2>Весь сад расцвёл — как и ты!</h2>
+      <p>С днём рождения, мама! Ты у нас самая тёплая, рукастая и смешливая. Спасибо, что ты есть.</p>
+      <button class="btn" id="again" type="button">Посмотреть сначала</button>
+    </div>
+  </section>
+
+  <p class="sign">Твои любящие дочки ❤</p>
+</article>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+const wishes = [
+  'Пусть гортензии цветут так пышно, что соседи записываются к тебе на экскурсию.',
+  'Пусть вата всегда слушается, а клей прилипает только к игрушкам, а не к пальцам.',
+  'Здоровья — крепкого, как наш семейный характер!',
+  'Пусть дочки звонят чаще, чем ты успеваешь соскучиться.',
+  'Пусть каждая твоя игрушка находит свою ёлку и своё место в чьём-то сердце.',
+  'Спасибо тебе за всё, мама. Мы тебя очень-очень любим!'
+];
+const palettes = [
+  ['#8fb3e8', '#a6c3ef', '#7aa3df', '#b9cff3'],
+  ['#b9a4e3', '#cbbaf0', '#a68fd8', '#d8cbf5'],
+  ['#f2a7c3', '#f6bdd2', '#e993b5', '#f9d0de'],
+  ['#a6b9ee', '#c2b3ec', '#9aaee6', '#d0c4f2'],
+  ['#f0b2cf', '#d9b0e6', '#e8a0c4', '#f5c9e0'],
+  ['#9cc0ea', '#b3a7e6', '#c8d6f5', '#8fb0e4']
+];
+const NS = 'http://www.w3.org/2000/svg';
+const garden = document.getElementById('garden');
+let rng = 7; const rand = () => (rng = (rng * 9301 + 49297) % 233280) / 233280;
+
+palettes.forEach((pal, b) => {
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.className = 'bush';
+  btn.setAttribute('aria-label', `Куст гортензии ${b + 1}: распустить и прочитать пожелание`);
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 120 124');
+  [[-34, '#6f9a63'], [34, '#86b078'], [-12, '#7aa66d'], [14, '#6f9a63']].forEach(([rot, col]) => {
+    const e = document.createElementNS(NS, 'ellipse');
+    e.setAttribute('cx', 60); e.setAttribute('cy', 96); e.setAttribute('rx', 13); e.setAttribute('ry', 26);
+    e.setAttribute('fill', col); e.setAttribute('transform', `rotate(${rot} 60 118)`);
+    svg.appendChild(e);
+  });
+  const N = 38;
+  for (let i = 0; i < N; i++) {
+    const r = 36 * Math.sqrt((i + .5) / N), a = i * 2.39996;
+    const x = 60 + r * Math.cos(a), y = 54 + r * Math.sin(a) * .92;
+    const outer = document.createElementNS(NS, 'g'); outer.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(rand() * 90).toFixed(0)})`);
+    const fl = document.createElementNS(NS, 'g'); fl.setAttribute('class', 'fl');
+    fl.style.setProperty('--c', pal[Math.floor(rand() * pal.length)]);
+    fl.style.transitionDelay = `${(r / 36 * .35).toFixed(2)}s`;
+    [[0, -4.2], [4.2, 0], [0, 4.2], [-4.2, 0]].forEach(([dx, dy]) => {
+      const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', dx); c.setAttribute('cy', dy); c.setAttribute('r', 4.4); fl.appendChild(c);
+    });
+    const d = document.createElementNS(NS, 'circle'); d.setAttribute('r', 1.4); d.setAttribute('class', 'dot');
+    fl.appendChild(d);
+    outer.appendChild(fl); svg.appendChild(outer);
+  }
+  btn.appendChild(svg);
+  btn.addEventListener('click', () => bloom(btn));
+  garden.appendChild(btn);
+});
+
+let opened = 0, soundOn = true, ctx = null;
+const wish = document.getElementById('wish'), count = document.getElementById('count');
+const finale = document.getElementById('finale'), hint = document.getElementById('hint');
+const soundBtn = document.getElementById('soundBtn');
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const notes = [784, 880, 988, 1175, 1319, 1568];
+
+function chime(freqs, step) {
+  if (!soundOn) return;
+  try {
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = ctx.currentTime;
+    freqs.forEach((f, k) => {
+      const t = t0 + k * (step || 0);
+      [1, 2.01].forEach((mult, h) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = f * mult;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(h ? 0.03 : 0.12, t + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+        o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 1.5);
+      });
+    });
+  } catch (e) {}
+}
+
+function bloom(btn) {
+  if (btn.classList.contains('open')) return;
+  btn.classList.add('open');
+  btn.setAttribute('aria-disabled', 'true');
+  chime([notes[opened]]);
+  petals(btn, 40);
+  wish.classList.add('fade');
+  const text = wishes[opened];
+  opened++;
+  setTimeout(() => { wish.textContent = text; wish.classList.remove('fade'); }, 220);
+  count.textContent = `Распустилось ${opened} из 6`;
+  if (opened === wishes.length) setTimeout(celebrate, 1600);
+}
+
+function celebrate() {
+  hint.hidden = true;
+  finale.hidden = false;
+  chime([784, 988, 1175, 1568, 1319, 1568], 0.18);
+  petals(null, 200);
+  setTimeout(() => petals(null, 140), 800);
+}
+
+document.getElementById('again').addEventListener('click', () => {
+  document.querySelectorAll('.bush').forEach(b => { b.classList.remove('open'); b.removeAttribute('aria-disabled'); });
+  opened = 0; finale.hidden = true; hint.hidden = false;
+  count.textContent = 'Распустилось 0 из 6';
+  wish.textContent = 'Твой сад ждёт, когда ты его разбудишь 🌿';
+});
+soundBtn.addEventListener('click', () => {
+  soundOn = !soundOn;
+  soundBtn.textContent = soundOn ? 'Звук: вкл' : 'Звук: выкл';
+  soundBtn.setAttribute('aria-pressed', soundOn);
+});
+
+const cv = document.getElementById('fx'), c2 = cv.getContext('2d');
+let parts = [], running = false;
+function petals(el, n) {
+  if (reduce) return;
+  cv.width = innerWidth; cv.height = innerHeight;
+  const cols = ['#a6c3ef', '#cbbaf0', '#f6bdd2', '#e48aae', '#8a6fc9', '#ffffff'];
+  let box = el ? el.getBoundingClientRect() : { left: 0, top: -20, width: innerWidth, height: 0 };
+  for (let i = 0; i < n; i++) {
+    const big = !el;
+    parts.push({
+      x: box.left + (big ? Math.random() * box.width : box.width / 2), y: box.top + (big ? 0 : box.height / 2.4),
+      vx: (Math.random() - .5) * (big ? 2 : 6), vy: big ? Math.random() * 2 + 1 : -Math.random() * 5 - 1,
+      s: 5 + Math.random() * 6, c: cols[i % cols.length], a: Math.random() * 6, sw: Math.random() * 6, life: big ? 420 : 110, g: big ? .02 : .15
+    });
+  }
+  if (!running) { running = true; requestAnimationFrame(tick); }
+}
+function tick() {
+  c2.clearRect(0, 0, cv.width, cv.height);
+  parts.forEach(p => {
+    p.sw += .05; p.x += p.vx + Math.sin(p.sw) * .6; p.y += p.vy; p.vy += p.g; p.a += .04; p.life--;
+    c2.save(); c2.translate(p.x, p.y); c2.rotate(p.a); c2.fillStyle = p.c; c2.globalAlpha = Math.min(1, p.life / 40);
+    c2.beginPath(); c2.ellipse(0, 0, p.s, p.s * .55, 0, 0, Math.PI * 2); c2.fill(); c2.restore();
+  });
+  parts = parts.filter(p => p.life > 0 && p.y < cv.height + 30);
+  if (parts.length) requestAnimationFrame(tick); else { running = false; c2.clearRect(0, 0, cv.width, cv.height); }
+}
+</script>
+</body></html>
